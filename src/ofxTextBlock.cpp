@@ -31,7 +31,7 @@ ofxTextBlock::~ofxTextBlock()
     //dtor
 }
 
-void ofxTextBlock::init(string fontLocation, float fontSize){
+void ofxTextBlock::init(string fontLocation, float fontSize, bool drawAsShapes){
 
     defaultFont.loadFont(fontLocation, fontSize, true, true, true, 0.05, 96);
 
@@ -40,6 +40,8 @@ void ofxTextBlock::init(string fontLocation, float fontSize){
     blankSpaceWord.width   = defaultFont.stringWidth ("x");
     blankSpaceWord.height  = defaultFont.stringHeight("i");
     blankSpaceWord.color.r = blankSpaceWord.color.g = blankSpaceWord.color.b = 255;
+    
+    _drawAsShapes = drawAsShapes;
 
 }
 
@@ -80,7 +82,11 @@ void ofxTextBlock::drawLeft(float x, float y){
                 //glTranslatef(drawX, drawY, 0.0f);
                 glScalef(scale, scale, scale);
 
-                defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                if(_drawAsShapes)
+                    defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                else
+                    defaultFont.drawString(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                
                 currX += words[currentWordID].width;
 
                 glPopMatrix();
@@ -131,7 +137,11 @@ void ofxTextBlock::drawCenter(float x, float y){
 
                 glScalef(scale, scale, scale);
 
-                defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                if(_drawAsShapes)
+                    defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                else
+                    defaultFont.drawString(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                    
                 currX += words[currentWordID].width;
 
                 glPopMatrix();
@@ -187,7 +197,11 @@ void ofxTextBlock::drawJustified(float x, float y, float boxWidth){
                 glScalef(scale, scale, scale);
 
                 if (words[currentWordID].rawWord != " ") {
-                    defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                    if(_drawAsShapes)
+                        defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                    else
+                        defaultFont.drawString(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                        
                     currX += words[currentWordID].width;
                 }
                 else {
@@ -214,7 +228,11 @@ void ofxTextBlock::drawJustified(float x, float y, float boxWidth){
             //Move to top left point using pre-scaled co-ordinates
             glTranslatef(x, y, 0.0f);
             glScalef(scale, scale, scale);
-            defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+            if(_drawAsShapes)
+                defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+            else
+                defaultFont.drawString(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                
             currX += words[currentWordID].width;
             glPopMatrix();
             
@@ -252,7 +270,11 @@ void ofxTextBlock::drawRight(float x, float y){
                 glTranslatef(x, y, 0.0f);
                 glScalef(scale, scale, scale);
 
-                defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                if(_drawAsShapes)
+                    defaultFont.drawStringAsShapes(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                else
+                    defaultFont.drawString(words[currentWordID].rawWord.c_str(), drawX, drawY);
+                    
                 currX += words[currentWordID].width;
 
                 glPopMatrix();
@@ -538,7 +560,17 @@ void ofxTextBlock::forceScale(float _scale){
     scale = _scale;
 }
 
-void ofxTextBlock::TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin, ofColor textColor, ofColor backColor){
+float ofxTextBlock::getTextToPixelsHeight(string text, string font, int size, float width, float margin){
+  
+    ofxTextBlock layout;
+    layout.init(font, size);
+    layout.setText(text);
+    layout.wrapTextX(width-margin*2);
+    
+    return layout.getHeight();
+}
+
+void ofxTextBlock::TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin, ofColor textColor, ofColor backColor, TextBlockAlignment allignment){
     ofFbo fbo;
     fbo.allocate(width,height,GL_RGBA);
     
@@ -551,7 +583,21 @@ void ofxTextBlock::TextToPixels(ofPixels* pix, string text, string font, int siz
     ofClear(backColor);
     glBlendFuncSeparate(GL_ONE, GL_SRC_COLOR, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     ofSetColor(textColor);
-    layout.drawJustified(margin,0.5*height-0.5*layout.getHeight(),width-margin*2);
+    switch(allignment){
+        case OF_TEXT_ALIGN_LEFT:
+            layout.drawLeft(margin,0.5*height-0.5*layout.getHeight());
+            break;
+        case OF_TEXT_ALIGN_RIGHT:
+            layout.drawRight(margin,0.5*height-0.5*layout.getHeight());
+            break;
+        case OF_TEXT_ALIGN_JUSTIFIED:
+            layout.drawJustified(margin,0.5*height-0.5*layout.getHeight(),width-margin*2);
+            break;
+        case OF_TEXT_ALIGN_CENTER:
+            layout.drawCenter(margin,0.5*height-0.5*layout.getHeight());
+            break;
+    }
+    
     fbo.end();
     
     fbo.readToPixels(*pix);

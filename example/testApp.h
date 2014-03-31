@@ -22,6 +22,8 @@ class testApp : public ofBaseApp{
 
 		ofxTextBlock        myText;
 		TextBlockAlignment  alignment;  //constants for controlling state
+    
+        ofImage             myTextToImage;
 
 };
 

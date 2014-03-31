@@ -3,13 +3,25 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    myText.init("frabk.ttf", 80);
+    myText.init("frabk.ttf", 24);
 
-    myText.setText("Welcome. L is for Left, while R is for Right. Center it up with C, or hit J to Justify.  Press 1 to wrap constrained on x, or 2 to fit type to the area.");
+    myText.setText("Welcome. \nL is for Left, while R is for Right. Center it up with C, or hit J to Justify.  Press 1 to wrap constrained on x fitting the window's width, or 2 to fit type to the area.");
 
     //Initially wrap the text to the screen width
     myText.wrapTextX(ofGetWidth());
+    
+   
+    //Convert text to Image
+    //Get the resultaing image height to preallocate an ofPixels object
+    string text2 = "This is a text converted to image. Press m to mirror it";
+    float textToImgHeight = ofxTextBlock::getTextToPixelsHeight(text2, "frabk.ttf", 24, ofGetWidth()/4);
+    ofPixels pixels;
+    pixels.allocate(ofGetWidth()/4,textToImgHeight, OF_IMAGE_COLOR_ALPHA);
+    ofxTextBlock::TextToPixels(&pixels, text2, "frabk.ttf", 24, ofGetWidth()/4, textToImgHeight);
 
+    myTextToImage.setFromPixels(pixels);
+    myTextToImage.setAnchorPercent(0.5,0.5);
+    
 }
 
 //--------------------------------------------------------------
@@ -36,7 +48,8 @@ void testApp::draw(){
             break;
 
     }
-
+    
+    myTextToImage.draw(ofGetWidth()/2, ofGetHeight()/2);
 
 }
 
@@ -63,10 +76,11 @@ void testApp::keyPressed(int key){
             break;
         case 'j':
             alignment = OF_TEXT_ALIGN_JUSTIFIED;
-
             break;
 
-
+        case 'm':
+            myTextToImage.mirror(false,true);
+            break;
     }
 
 }
