@@ -538,4 +538,22 @@ void ofxTextBlock::forceScale(float _scale){
     scale = _scale;
 }
 
-
+void ofxTextBlock::TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin, ofColor textColor, ofColor backColor){
+    ofFbo fbo;
+    fbo.allocate(width,height,GL_RGBA);
+    
+    ofxTextBlock layout;
+    layout.init(font, size);
+    layout.setText(text);
+    layout.wrapTextX(width-margin*2);
+    
+    fbo.begin();
+    ofClear(backColor);
+    glBlendFuncSeparate(GL_ONE, GL_SRC_COLOR, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    ofSetColor(textColor);
+    layout.drawJustified(margin,0.5*height-0.5*layout.getHeight(),width-margin*2);
+    fbo.end();
+    
+    fbo.readToPixels(*pix);
+    return;
+}

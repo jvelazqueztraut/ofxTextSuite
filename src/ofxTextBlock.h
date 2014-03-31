@@ -81,6 +81,8 @@ class ofxTextBlock
 
         float   getWidth();
         float   getHeight();
+    
+    static void TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin=20, ofColor textColor=ofColor(255,255), ofColor backColor=ofColor(0,0));
 
     protected:
 
