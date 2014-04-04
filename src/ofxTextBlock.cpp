@@ -33,7 +33,7 @@ ofxTextBlock::~ofxTextBlock()
 
 void ofxTextBlock::init(string fontLocation, float fontSize, bool drawAsShapes){
 
-    defaultFont.loadFont(fontLocation, fontSize, true, true, true, 0.05, 96);
+    defaultFont.loadFont(fontLocation, fontSize, true, true, true, 0.01, 72);
 
     //Set up the blank space word
     blankSpaceWord.rawWord = " ";
@@ -466,7 +466,7 @@ void ofxTextBlock::_loadWords(){
         tmpWord.rawWord = tokens.at(i);
         tmpWord.width   = defaultFont.stringWidth(tmpWord.rawWord);
         tmpWord.height  = defaultFont.stringHeight(tmpWord.rawWord);
-        tmpWord.color.r = tmpWord.color.g = tmpWord.color.b = 150;
+        tmpWord.color.r = tmpWord.color.g = tmpWord.color.b = 255;
         words.push_back(tmpWord);
         //add spaces into the words vector if it is not the last word.
         if (i != tokens.size()) words.push_back(blankSpaceWord);
@@ -570,14 +570,15 @@ float ofxTextBlock::getTextToPixelsHeight(string text, string font, int size, fl
     return layout.getHeight();
 }
 
-void ofxTextBlock::TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin, ofColor textColor, ofColor backColor, TextBlockAlignment allignment){
+void ofxTextBlock::TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin, ofColor textColor, ofColor backColor, TextBlockAlignment allignment, bool shapes){
     ofFbo fbo;
     fbo.allocate(width,height,GL_RGBA);
     
     ofxTextBlock layout;
-    layout.init(font, size);
+    layout.init(font, size, shapes);
     layout.setText(text);
     layout.wrapTextX(width-margin*2);
+    layout.setColor(textColor.r, textColor.g, textColor.b, textColor.a);
     
     fbo.begin();
     ofClear(backColor);

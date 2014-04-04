@@ -59,7 +59,7 @@ class ofxTextBlock
         vector<wordBlock>   words;
         vector<lineBlock>   lines;
 
-        void    init(string fontLocation, float fontSize, bool drawAsShapes=true);
+        void    init(string fontLocation, float fontSize, bool drawAsShapes=false);
 
         void    setText(string _inputText);
 
@@ -82,7 +82,7 @@ class ofxTextBlock
         float   getWidth();
         float   getHeight();
     
-    static void TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin=20, ofColor textColor=ofColor(255,255), ofColor backColor=ofColor(0,0), TextBlockAlignment allignment=OF_TEXT_ALIGN_JUSTIFIED);
+    static void TextToPixels(ofPixels* pix, string text, string font, int size, float width, float height, float margin=20, ofColor textColor=ofColor(255,255), ofColor backColor=ofColor(0,0), TextBlockAlignment allignment=OF_TEXT_ALIGN_JUSTIFIED, bool shapes=false);
     static float getTextToPixelsHeight(string text, string font, int size, float width, float margin=20);
 
     protected:
